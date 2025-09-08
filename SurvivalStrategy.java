@@ -1,29 +1,39 @@
 package mirobot;
 
+import robocode.JuniorRobot;
+
 public class SurvivalStrategy extends CombatStrategy{
-    @Override
-    public void onScannedRobot(Demoleitor lulu) {
-        System.out.println("Escanee un robot y le dispare, estoy en survival");
-        // Apuntar el arma hacia el robot
-        lulu.turnGunTo(lulu.scannedAngle);
-        // Si está cerca disparo fuerte, si está lejos disparo suave
-        if (lulu.scannedDistance < 200) {
-            lulu.fire(3);
-        } else {
-            lulu.fire(1);
-        }
+
+    public SurvivalStrategy (JuniorRobot robot){
+        super (robot);
     }
 
     @Override
-    public void onHitByBullet(Demoleitor lulu){
-        System.out.println("Me dispararon");
-        lulu.goTo(lulu.fieldWidth / 2, lulu.fieldHeight / 2);
+    public void onScannedRobot() {
+        //Apuntar el arma hacia el robot
+        robot.turnGunTo(robot.scannedAngle);
+        //Le sigo disparando
+        robot.fire(1);
     }
 
     @Override
-    public void onHitWall(Demoleitor lulu) {
-        System.out.println("estoy en supervivencia");
-        lulu.goTo(lulu.fieldWidth / 2, lulu.fieldHeight / 2);
+    public void onHitRobot() {
+        //Le sigo disparando
+        robot.turnGunTo(robot.hitRobotAngle);
+        robot.fire(2);
+    }
+
+    @Override
+    public void onHitByBullet(){
+        robot.turnGunTo(robot.hitByBulletAngle);
+        robot.fire(1);
+        //Me voy
+        getAway();
+    }
+
+    @Override
+    public void onHitWall() {
+        getAway();
     }
 
 }

@@ -2,74 +2,48 @@ package mirobot;
 import robocode.*;
 
 public class Demoleitor extends JuniorRobot {
-    private CombatStrategy strategy = new OffensiveStrategy();
-
-    public void setStrategy(CombatStrategy strategy) {
+    private CombatActions strategy = new OffensiveStrategy(this);   //COLOQUIO, alcanzaba con definirlo 1 vez sóla.
+    private StrategicTactics entrenador = StrategicStrategy.MI_PRIMER_STRATEGIC_TACTICS;
+    public void setStrategy(CombatActions strategy) {
         this.strategy = strategy;
     }
 
     @Override
     public void run() {
-        setColors(purple, purple, purple, purple, purple);
+        setColors(purple, purple, purple, white, red);
         System.out.println("Arranca el juego...");
-        turnTo(180);
-        this.goTo(20,20);
-
         while (true) {
             // Elijo una estrategia en base a mi energia
-            if (energy > 70) {
-                setStrategy(new OffensiveStrategy());
-            } else if (energy > 50) {
-                setStrategy(new DefensiveStrategy());
+            if (this.energy > 90) {                             //COLOQUIO, esto era para la segunda
+                setStrategy(new OffensiveStrategy(this));           //para la segunda deberia considerar más cosas
+            } else if (this.energy > 80) {                      //como la cantidad de enemigos, mi energia (ya lo tengo)
+                setStrategy(new DefensiveStrategy(this));
             } else {
-                setStrategy(new SurvivalStrategy());
+                setStrategy(new SurvivalStrategy(this));
             }
             //Escaneo el ring
             turnGunRight(360);
-            turnTo(90);   // mirar al este
-            ahead(200);   // avanzar
+            //Me retiro
+            ahead(200);
         }
     }
 
-    @Override
-    public void onScannedRobot() {
-        this.strategy.onScannedRobot(this);
-    }
+    @Override  //COLOQUIO, esta bien que le mande a this por parametro
+    public void onScannedRobot() {this.strategy.onScannedRobot();}
 
     @Override
     public void onHitByBullet() {
-        this.strategy.onHitByBullet(this);
+        this.strategy.onHitByBullet();
     }
 
     @Override
     public void onHitWall() {
-        this.strategy.onHitWall(this);
+        this.strategy.onHitWall();
     }
 
-    void goTo(double targetX, double targetY) {
-        // ejemplo: imprimir posición y heading actual
-        System.out.println("El medio, a donde quiero ir -> X: " + targetX + " Y: " + targetY);
-        System.out.println("Posición inicial -> X: " + robotX + " Y: " + robotY);
-        System.out.println("Heading inicial: " + heading);
-
-        double dx = targetX - robotX;  // diferencia en X
-        double dy = targetY - robotY;  // diferencia en Y
-
-        // Calcular ángulo absoluto hacia el objetivo
-        int angleToTarget = (int) Math.toDegrees(Math.atan2(dx, dy));
-        // Girar hacia ese ángulo
-        turnTo(angleToTarget);
-
-        // Calcular distancia al objetivo
-        int distance = (int) Math.hypot(dx, dy);
-        System.out.println("dx: " + dx + " dy: " + dy);
-        System.out.println("Ángulo calculado: " + angleToTarget);
-        System.out.println("Distancia calculada: " + distance);
-
-        // Avanzar hasta el punto
-        ahead(distance);
-
-        System.out.println("Nueva posición -> X: " + robotX + " Y: " + robotY);
-        System.out.println("Nuevo heading: " + heading);
+    @Override
+    public void onHitRobot() {
+        this.strategy.onHitRobot();
     }
+
 }
